@@ -33,7 +33,7 @@ $routes->get('/', 'Home::index');
 
 // Development route
 $routes->get('/first-app', function(){
-    echo "<h1 align='center'>Hello Codeigniter</h1>";
+    echo "<h1 align='center' style='color:blue;'>Hello Codeigniter</h1>";
 });
 
 /*
