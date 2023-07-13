@@ -2,6 +2,8 @@
 
 namespace Config;
 
+use App\Controllers\UserController;
+
 // Create a new instance of our RouteCollection class.
 $routes = Services::routes();
 
@@ -31,10 +33,19 @@ $routes->set404Override();
 // route since we don't have to scan directories.
 $routes->get('/', 'Home::index');
 
-// Development route
+// Development routes
 $routes->get('/first-app', function(){
     echo "<h1 align='center' style='color:blue;'>Hello Codeigniter</h1>";
 });
+
+// Login & Registration routes
+// $routes->match(['get', 'post'], 'register', 'UserController::userRegister', ['filter' => 'noauth']);
+$routes->match(['get','post'], 'register', [UserController::class,'userRegister'],['filter' => 'noauth']);
+$routes->match(['get','post'], 'login',[UserController::class,'userLogin'],['filter' => 'noauth']);
+$routes->get('dashboard',[UserController::class,'userDashboard'],['filter' => 'auth']);
+$routes->get('profile',[UserController::class,'userProfile'],['filter'=> 'auth']);
+$routes->get('logout',[UserController::class,'userLogout']);
+
 
 /*
  * --------------------------------------------------------------------
