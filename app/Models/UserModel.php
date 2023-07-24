@@ -4,6 +4,7 @@ namespace App\Models;
 
 use CodeIgniter\Model;
 
+
 class UserModel extends Model
 {
     protected $DBGroup          = 'default';
@@ -39,18 +40,19 @@ class UserModel extends Model
     protected $beforeDelete   = [];
     protected $afterDelete    = [];
 
-    protected function beforeInsert(array $data)
-	{
+    protected function beforeInsert(array $data): array
+    {
 		$data = $this->passwordHash($data);
 		return $data;
 	}
 
-	protected function passwordHash(array $data)
-	{
+	protected function passwordHash(array $data): array
+    {
 		if (isset($data['data']['password'])) {
 			$data['data']['password'] = password_hash($data['data']['password'], PASSWORD_DEFAULT);
 		}
 
 		return $data;
+
 	}
 }

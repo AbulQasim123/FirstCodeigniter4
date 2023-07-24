@@ -14,13 +14,13 @@
 // Or with jQuery
 
 $(document).ready(function () {
-  var elems = $(".sidenav");
-  var instances = M.Sidenav.init(elems, {});
+    var elems = $(".sidenav");
+    var instances = M.Sidenav.init(elems, {});
 
-  var closeIcon = $(".sidenav li a.right");
-  var sidenavInstance = instances[0];
+    var closeIcon = $(".sidenav li a.right");
+    var sidenavInstance = instances[0];
 
-  closeIcon.on("click", function () {
-    sidenavInstance.close();
-  });
+    closeIcon.on("click", function () {
+        sidenavInstance.close();
+    });
 });

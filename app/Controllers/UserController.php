@@ -3,14 +3,14 @@
 namespace App\Controllers;
 
 use App\Models\UserModel;
-use App\Controllers\BaseController;
+//use App\Controllers\BaseController;
 
 class UserController extends BaseController
 {
     // User Registration
     public function userRegister()
     {
-        $data = [];
+//        $data = [];
         if ($this->request->getMethod() == 'post') {
             //let's do the validation here
             $rules = [
@@ -82,6 +82,11 @@ class UserController extends BaseController
     }
     
     // Set User Session
+
+    /**
+     * @param $user
+     * @return true
+     */
     private function setUserSession($user)
     {
         $data = [
