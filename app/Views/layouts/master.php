@@ -11,7 +11,7 @@
     <!-- Material Icons -->
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
     <!-- Custom Style -->
-    <link href="<?php echo base_url('assets/css/style.css'); ?>" rel="stylesheet" type="text/css" />
+    <link href="<?= base_url('assets/css/style.css'); ?>" rel="stylesheet" type="text/css" />
 </head>
 
 <body>
@@ -23,7 +23,7 @@
     <!-- Compiled and minified Materialize -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
     <!-- Custom Script -->
-    <script type="text/javascript" src="<?php echo base_url('assets/js/script.js'); ?>"></script>
+    <script type="text/javascript" src="<?= base_url('assets/js/script.js'); ?>"></script>
 
 </body>
 
