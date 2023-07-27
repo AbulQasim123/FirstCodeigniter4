@@ -1,11 +1,11 @@
-<?= $this->extend('layouts/master') ?>
-<?= $this->section('content') ?>
+<?= $this->extend('layouts/usermaster') ?>
+<?= $this->section('login-register') ?>
 
 <div class="" style="margin-top:20px;">
     <div class="row">
         <div class="col s12 m8 offset-m2 l6 offset-l3">
             <div class="card grey lighten-5">
-                <div class="card-content white-text">
+                <div class="card-content">
                     <span class="card-title black-text">Login</span>
                     <!-- <div class="divider"></div> -->
                     <form class="" action="<?= base_url('login') ?>" method="post">

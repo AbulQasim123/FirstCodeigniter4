@@ -3,25 +3,59 @@
 namespace App\Controllers;
 
 use App\Models\UserModel;
-//use App\Controllers\BaseController;
+use App\Controllers\BaseController;
+use App\Models\Employee as EmployeeModel;
+use App\Validation\UserRules;
 
-class UserController extends BaseController
+class AuthController extends BaseController
 {
+    protected $employee;
+    public function __construct()
+    {
+        $this->employee = new EmployeeModel();
+    }
     // User Registration
     public function userRegister()
     {
-//        $data = [];
+        $data = [];
         if ($this->request->getMethod() == 'post') {
             //let's do the validation here
             $rules = [
                 'name' => 'required|min_length[3]|max_length[20]',
-                'phone_no' => 'required|min_length[9]|max_length[20]',
+                'phone_no' => 'required|max_length[10]',
                 'email' => 'required|min_length[6]|max_length[50]|valid_email|is_unique[users.email]',
-                'password' => 'required|min_length[3]|max_length[255]',
-                'password_confirm' => 'matches[password]',
+                'password' => 'required|min_length[3]|max_length[16]',
+                'password_confirm' => 'required|matches[password]',
+            ];
+            $messages = [
+                'name' => [
+                    'required' => 'Name is requird?',
+                    'min_length' => 'Name at least 3 chars long?',
+                    'max_length' => 'Name is exceeded only 20 chars long'
+                ],
+
+                'phone_no' => [
+                    'required' => 'Phone number is required?',
+                    'max_length' => 'Phone number extact 10 chars long'
+                ],
+                'email' => [
+                    'required' => 'Email is required?',
+                    'min_length' => 'Email at least 6 chars long?',
+                    'max_length' => 'Email is exceeded only 50 chars long?',
+                    'valid_email' => 'Please enter valid email address!',
+                    'is_unique' => 'Email already exist!'
+                ],
+                'password' => [
+                    'required' => 'Password is required?',
+                    'min_length' => 'Email at least 3 chars long!',
+                    'max_length' => 'Email at least 16 chars long!',
+                ],
+                'password_confirm' => [
+                    'matches' => 'The password confirmation does not match the password.',
+                ]
             ];
 
-            if (!$this->validate($rules)) {
+            if (!$this->validate($rules, $messages)) {
 
                 return view('users/register', [
                     "validation" => $this->validator,
@@ -48,7 +82,6 @@ class UserController extends BaseController
     public function userLogin()
     {
         $data = [];
-
         if ($this->request->getMethod() == 'post') {
 
             $rules = [
@@ -56,18 +89,22 @@ class UserController extends BaseController
                 'password' => 'required|min_length[3]|max_length[255]|validateUser[email,password]',
             ];
 
-            $errors = [
+            $messages = [
+                'email' => [
+                    'required' => 'Email is required?',
+                    'min_length' => 'Email at least 6 chars long?',
+                    'max_length' => 'Email is exceeded only 50 chars long?',
+                    'valid_email' => 'Please enter valid email address!',
+                ],
                 'password' => [
                     'validateUser' => "Email or Password don't match",
                 ],
             ];
 
-            if (!$this->validate($rules, $errors)) {
-
+            if (!$this->validate($rules, $messages)) {
                 return view('users/login', [
                     "validation" => $this->validator,
                 ]);
-
             } else {
                 $model = new UserModel();
                 $user = $model->where('email', $this->request->getVar('email'))->first();
@@ -75,12 +112,11 @@ class UserController extends BaseController
                 $this->setUserSession($user);
                 // Redirecting to dashboard after login
                 return redirect()->to(base_url('dashboard'));
-
             }
         }
         return view('users/login');
     }
-    
+
     // Set User Session
 
     /**
@@ -103,18 +139,18 @@ class UserController extends BaseController
     // User Dashboard
     public function userDashboard()
     {
-        return view("users/dashboard");
+        $employees = $this->employee->findAll();
+        return view('dashboard/dashboard', ['employees' => $employees]);
     }
 
     // User Profile
     public function userProfile()
     {
-
         $data = [];
         $model = new UserModel();
 
         $data['user'] = $model->where('id', session()->get('id'))->first();
-        return view('users/profile', $data);
+        return view('dashboard/profile', $data);
     }
 
     // User Logout

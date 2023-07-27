@@ -2,8 +2,8 @@
 
 namespace Config;
 
-use App\Controllers\UserController;
-
+use App\Controllers\AuthController;
+use App\Controllers\Employee as EmployeeController;
 // Create a new instance of our RouteCollection class.
 $routes = Services::routes();
 
@@ -40,13 +40,24 @@ $routes->get('/first-app', function(){
 
 // Login & Registration routes
 // $routes->match(['get', 'post'], 'register', 'UserController::userRegister', ['filter' => 'noauth']);
-$routes->match(['get','post'], 'register', [UserController::class,'userRegister'],['filter' => 'noauth']);
-$routes->match(['get','post'], 'login',[UserController::class,'userLogin'],['filter' => 'noauth']);
-$routes->get('dashboard',[UserController::class,'userDashboard'],['filter' => 'auth']);
-$routes->get('profile',[UserController::class,'userProfile'],['filter'=> 'auth']);
-$routes->get('logout',[UserController::class,'userLogout']);
+$routes->match(['get','post'], 'register', [AuthController::class,'userRegister'],['filter' => 'noauth']);
+$routes->match(['get','post'], 'login',[AuthController::class,'userLogin'],['filter' => 'noauth']);
+$routes->get('dashboard',[AuthController::class,'userDashboard'],['filter' => 'auth']);
+$routes->get('profile',[AuthController::class,'userProfile'],['filter'=> 'auth']);
+$routes->get('logout',[AuthController::class,'userLogout']);
 
-
+// Crud Employee routes
+$routes->group('serverside', ['filter' => 'auth'], function ($routes) {
+    // server side crud
+    $routes->match(['get', 'post'], 'add-employee', [EmployeeController::class,'addEmployee']);
+    $routes->match(['get', 'post'], 'edit-employee/(:num)', [EmployeeController::class, 'editEmployee']);
+    $routes->get('del-employee/(:num)', [EmployeeController::class, 'deleteEmployee']);
+    
+    // client side crud
+    $routes->match(['get', 'post'], 'add-post', [EmployeeController::class,'addPost']);
+});
+// $routes->get("list-members", "Member::listMember");
+// $routes->get("delete-member/(:num)", "Member::deleteMember/$1");
 /*
  * --------------------------------------------------------------------
  * Additional Routing

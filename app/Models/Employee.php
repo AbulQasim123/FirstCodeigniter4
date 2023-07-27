@@ -4,21 +4,20 @@ namespace App\Models;
 
 use CodeIgniter\Model;
 
-
-class UserModel extends Model
+class Employee extends Model
 {
     protected $DBGroup          = 'default';
-    protected $table            = 'users';
+    protected $table            = 'employees';
     protected $primaryKey       = 'id';
     protected $useAutoIncrement = true;
     protected $returnType       = 'array';
     protected $useSoftDeletes   = false;
-    protected $protectFields    = false;
-    protected $allowedFields    = ['name','email','phone_no','password'];
+    protected $protectFields    = true;
+    protected $allowedFields    = ['name', 'email', 'gender', 'date_of_birth', 'mobile_no', 'designation', 'address'];
 
     // Dates
-    protected $useTimestamps = true;
-    // protected $dateFormat    = 'datetime';
+    protected $useTimestamps = false;
+    protected $dateFormat    = 'datetime';
     protected $createdField  = 'created_at';
     protected $updatedField  = 'updated_at';
     protected $deletedField  = 'deleted_at';
@@ -31,7 +30,7 @@ class UserModel extends Model
 
     // Callbacks
     protected $allowCallbacks = true;
-    protected $beforeInsert   = ['beforeInsert'];
+    protected $beforeInsert   = [];
     protected $afterInsert    = [];
     protected $beforeUpdate   = [];
     protected $afterUpdate    = [];
@@ -39,19 +38,4 @@ class UserModel extends Model
     protected $afterFind      = [];
     protected $beforeDelete   = [];
     protected $afterDelete    = [];
-
-
-    protected function beforeInsert(array $data)
-    {
-		$data = $this->passwordHash($data);
-		return $data;
-	}
-
-	protected function passwordHash(array $data)
-    {
-		if (isset($data['password'])) {
-			$data['password'] = password_hash($data['password'], PASSWORD_DEFAULT);
-		}
-		return $data;
-	}
 }

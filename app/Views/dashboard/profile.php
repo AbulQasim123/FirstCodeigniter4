@@ -1,6 +1,6 @@
 <?= $this->extend('layouts/master') ?>
 <?= $this->section('content') ?>
-<div class="" style="margin-top: 20px;">
+<div class="" style="margin-top: 10px;">
     <div class="row">
         <div class="col s12 m8 offset-m2 l6 offset-l3">
             <div class="card-panel grey lighten-5">
