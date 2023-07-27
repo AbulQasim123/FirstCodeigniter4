@@ -1,5 +1,15 @@
 <?= $this->extend('layouts/master') ?>
 <?= $this->section('content') ?>
+<?php if (session()->has('success')) : ?>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            M.toast({
+                html: '<?= session('success') ?>'
+            });
+        });
+    </script>
+<?php endif; ?>
+
 <div class="">
     <div class="content-area">
         <div class="card">
@@ -14,13 +24,6 @@
                 </div>
             </div>
             <div class="card-action">
-                <?php if (session()->has('success')) : ?> 
-                    <script>
-                        document.addEventListener('DOMContentLoaded', function() {
-                            M.toast({html: '<?= session('success') ?>'});
-                        });
-                    </script>
-                <?php endif; ?>
                 <table class="highlight responsive-table">
                     <thead>
                         <tr>

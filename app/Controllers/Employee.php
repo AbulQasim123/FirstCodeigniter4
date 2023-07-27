@@ -5,6 +5,7 @@ namespace App\Controllers;
 use App\Controllers\BaseController;
 use App\Models\Employee as EmployeeModel;
 use App\Models\PostModel;
+use PhpParser\Node\Expr\FuncCall;
 
 class Employee extends BaseController
 {
@@ -172,22 +173,13 @@ class Employee extends BaseController
     public function addPost()
     {
         if ($this->request->isAJAX()) {
-            // print_r($_POST);
-            // print_r($_FILES);
-            // die;
-            $file = $this->request->getFile('file');
+            $file = $this->request->getFile('post_image');
             $fileName = $file->getRandomName();
-            $addPost = [
-                'post_title' => $this->request->getVar('post_title'),
-                'post_catrgory' => $this->request->getVar('post_category'),
-                'post_body' => $this->request->getVar('post_body'),
-                'post_image' => $fileName,
-            ];      
             $rules = [
                 'post_title' => 'required|min_length[3]|max_length[55]',
                 'post_category' => 'required|min_length[3]|max_length[25]',
                 'post_body' => 'required|max_length[150]',
-                'file' => 'required|uploaded[file]|max_size[file,1024]|is_image[file]|mime_in[file,image/jpg,image/jpeg,image/png]',
+                'file' => 'uploaded[post_image]|max_size[post_image,1024]|is_image[post_image]|mime_in[post_image,image/jpg,image/jpeg,image/png]',
             ];
             $messages = [
                 'post_title' => [
@@ -204,14 +196,16 @@ class Employee extends BaseController
                     'required' => 'Post body is required',
                     'max_length' => 'Post body exceeded only 150 chars long?',
                 ],
-                'post_image' => [
-                    'required' => 'Image is required.',
-                    'uploaded' => 'Error while uploading the image.',
-                    'max_size' => 'The image size should not exceed 1 MB.',
-                    'is_image' => 'Invalid file type. Only images are allowed.',
-                    'mime_in' => 'Invalid file type. Only JPG, JPEG, and PNG images are allowed.',
-                ],
             ];
+
+            $addPost = [
+                'post_title' => $this->request->getVar('post_title'),
+                'post_category' => $this->request->getVar('post_category'),
+                'post_body' => $this->request->getVar('post_body'),
+                'post_image' => $fileName,
+                'created_at' => date('Y-m-d H:i:s')
+            ];
+
 
             if (!$this->validate($rules, $messages)) {
                 return $this->response->setJSON([
@@ -228,6 +222,164 @@ class Employee extends BaseController
             }
         } else {
             return view('clientside/add-post');
+        }
+    }
+
+    public function fetchAllPost()
+    {
+        $posts = $this->post->findAll();
+        $html = '';
+        if ($posts) {
+            foreach ($posts as $key => $post) {
+                $html .= '<div class="col s12 m6 l4 xl4">
+                <div class="card z-depth-2">
+                    <div class="card-image">
+                        <a href="">
+                            <img id="post_image" src="/assets/images/' . $post['post_image'] . '">
+                        </a>
+                    </div>
+                    <div class="card-content">
+                        <div class="row" style="margin-top: -35px;">
+                            <div class="col s8">
+                                <span style="font-weight: bold;">' . $post['post_title'] . '</span>
+                            </div>
+                            <div class="col s4 right-align">
+                                <span class="new badge">' . $post['post_category'] . '</span>
+                            </div>
+                        </div>
+                        <p>' . $post['post_body'] . '</p>
+                    </div>
+                    <div class="card-action" id="card-footer">
+                        <div class="row">
+                            <div class="col s6">
+                                <span style="font-style: italic;">' . date('d F Y', strtotime($post['created_at'])) . '</span>
+                            </div>
+                            <div class="col s6 right-align">
+                                <a href="#edit_post_modal" id="' . $post['id'] . '" class="btn-floating btn-small waves-effect waves-light pink modal-trigger edit_post_btn ">
+                                    <i class="material-icons">edit</i>
+                                </a>
+                                <a href="#delete_post_modal" id="' . $post['id'] . '" class="btn-floating btn-small waves-effect waves-light red modal-trigger delete_post_btn">
+                                    <i class="tiny material-icons">delete</i>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>';
+            }
+            return $this->response->setJSON([
+                'error' => false,
+                'message' => $html
+            ]);
+        } else {
+            return $this->response->setJSON([
+                'error' => false,
+                'message' => '<div class="center-align red-text" style="font-weight: bold; font-size: 22px">No posts found.</div>'
+            ]);
+        }
+    }
+
+
+    // handle edit post ajax request
+    public function editPost($id = null)
+    {
+        $edit_post = $this->post->find($id);
+        return $this->response->setJSON([
+            'error' => false,
+            'message' => $edit_post
+        ]);
+    }
+
+    // handle update post ajax request
+    public function updatePost()
+    {
+        // $id = $this->request->getPost('edit_post_id');
+        // $file = $this->request->getFile('edit_post_image');
+        // $fileName = $file->getFilename();
+        // if ($fileName != '') {
+        //     $fileName = $file->getRandomName();
+        //     // print_r($fileName); die;
+        //     $file->move('assets/images', $fileName);
+        //     if ($this->request->getPost('edit_old_image') != '') {
+        //         unlink('assets/images/' . $this->request->getPost('edit_old_image'));
+        //     }
+        // } else {
+        //     $fileName = $this->request->getPost('edit_old_image');
+        // }
+
+        $id = $this->request->getPost('edit_post_id');
+        $file = $this->request->getFile('edit_post_image');
+        $oldImage = $this->request->getPost('edit_old_image');
+
+        if ($file && $file->isValid()) {
+            $fileName = $file->getRandomName();
+            $file->move('assets/images', $fileName);
+
+            // Remove the old image file if it exists
+            if ($oldImage && file_exists('assets/images/' . $oldImage)) {
+                unlink('assets/images/' . $oldImage);
+            }
+        } else {
+            // If no new file is uploaded, keep the old image filename
+            $fileName = $oldImage;
+        }
+
+        $rules = [
+            'edit_post_title' => 'required|min_length[3]|max_length[55]',
+            'edit_post_category' => 'required|min_length[3]|max_length[25]',
+            'edit_post_body' => 'required|max_length[150]',
+            'file' => 'uploaded[post_image]|max_size[post_image,1024]|is_image[post_image]|mime_in[post_image,image/jpg,image/jpeg,image/png]',
+        ];
+        $messages = [
+            'edit_post_title' => [
+                'required' => 'Post title is requird?',
+                'min_length' => 'Post title at least 3 chars long?',
+                'max_length' => 'Post title exceeded only 55 chars long'
+            ],
+            'edit_post_category' => [
+                'required' => 'Post category is required?',
+                'min_length' => 'Post category at least 3 chars long?',
+                'max_length' => 'Post category exceeded only 25 chars long?',
+            ],
+            'edit_post_body' => [
+                'required' => 'Post body is required',
+                'max_length' => 'Post body exceeded only 150 chars long?',
+            ],
+        ];
+        $updatePost = [
+            'post_title' => $this->request->getVar('edit_post_title'),
+            'post_category' => $this->request->getVar('edit_post_category'),
+            'post_body' => $this->request->getVar('edit_post_body'),
+            'post_image' => $fileName,
+            'updated_at' => date('Y-m-d H:i:s')
+        ];
+
+        if (!$this->validate($rules, $messages)) {
+            return $this->response->setJSON([
+                'error' => true,
+                'messages' => $this->validator->getErrors()
+            ]);
+        } else {
+            // $file->move('assets/images', $fileName);
+            $this->post->update($id, $updatePost);
+            return $this->response->setJSON([
+                'error' => false,
+                'message' => 'Post Updated Successfully.'
+            ]);
+        }
+    }
+
+    // handle delete post ajax request
+    public function deletePost($id = null)
+    {
+        $delete_post = $this->post->find($id);
+        if ($delete_post) {
+            $this->post->delete($delete_post);
+            unlink('assets/images/' . $delete_post['post_image']);
+            return $this->response->setJSON([
+                'error' => false,
+                'message' => 'Post Deleted Successfully!'
+            ]);
         }
     }
 }

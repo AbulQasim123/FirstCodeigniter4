@@ -55,9 +55,12 @@ $routes->group('serverside', ['filter' => 'auth'], function ($routes) {
     
     // client side crud
     $routes->match(['get', 'post'], 'add-post', [EmployeeController::class,'addPost']);
+    $routes->get('fetch-all-post', [EmployeeController::class,'fetchAllPost']);
+    $routes->get('edit-post/(:num)', [EmployeeController::class,'editPost']);    
+    $routes->post('update-post', [EmployeeController::class,'updatePost']);
+    $routes->get('delete-post/(:num)', [EmployeeController::class,'deletePost']);
 });
-// $routes->get("list-members", "Member::listMember");
-// $routes->get("delete-member/(:num)", "Member::deleteMember/$1");
+
 /*
  * --------------------------------------------------------------------
  * Additional Routing

@@ -18,3 +18,11 @@
     height: 100vh;
     overflow-y: scroll;
 }
+
+#post_image{
+    height: 200px;
+}
+#card-footer{
+    height: 60px;
+    background-color: #eee;
+}
