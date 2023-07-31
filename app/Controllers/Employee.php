@@ -5,7 +5,6 @@ namespace App\Controllers;
 use App\Controllers\BaseController;
 use App\Models\Employee as EmployeeModel;
 use App\Models\PostModel;
-use PhpParser\Node\Expr\FuncCall;
 
 class Employee extends BaseController
 {
@@ -174,7 +173,9 @@ class Employee extends BaseController
     {
         if ($this->request->isAJAX()) {
             $file = $this->request->getFile('post_image');
-            $fileName = $file->getRandomName();
+            // $fileName = $file->getRandomName();
+            $ext = $file->getExtension(); // Get the original file extension
+            $fileName = uniqid() . '.' . $ext; // Generate a unique filename
             $rules = [
                 'post_title' => 'required|min_length[3]|max_length[55]',
                 'post_category' => 'required|min_length[3]|max_length[25]',
@@ -230,12 +231,12 @@ class Employee extends BaseController
         $posts = $this->post->findAll();
         $html = '';
         if ($posts) {
-            foreach ($posts as $key => $post) {
+            foreach ($posts as $post) {
                 $html .= '<div class="col s12 m6 l4 xl4">
                 <div class="card z-depth-2">
                     <div class="card-image">
-                        <a href="">
-                            <img id="post_image" src="/assets/images/' . $post['post_image'] . '">
+                        <a href="#detail_post_modal" id="' . $post['id'] . '" class="detail_post modal-trigger">
+                            <img id="post_image" src="http://localhost:2025/assets/images/' . $post['post_image'] . '">
                         </a>
                     </div>
                     <div class="card-content">
@@ -255,7 +256,7 @@ class Employee extends BaseController
                                 <span style="font-style: italic;">' . date('d F Y', strtotime($post['created_at'])) . '</span>
                             </div>
                             <div class="col s6 right-align">
-                                <a href="#edit_post_modal" id="' . $post['id'] . '" class="btn-floating btn-small waves-effect waves-light pink modal-trigger edit_post_btn ">
+                                <a href="#edit_post_modal" id="' . $post['id'] . '" class="btn-floating btn-small waves-effect waves-light pink modal-trigger edit_post_btn">
                                     <i class="material-icons">edit</i>
                                 </a>
                                 <a href="#delete_post_modal" id="' . $post['id'] . '" class="btn-floating btn-small waves-effect waves-light red modal-trigger delete_post_btn">
@@ -290,45 +291,41 @@ class Employee extends BaseController
         ]);
     }
 
+    
+    // handle detail post ajax request
+    public function detailPost($id = null)
+    {
+        $detail_post = $this->post->find($id);
+        return $this->response->setJSON([
+            'error' => false,
+            'message' => $detail_post
+        ]);
+    }
+
+
     // handle update post ajax request
     public function updatePost()
     {
-        // $id = $this->request->getPost('edit_post_id');
-        // $file = $this->request->getFile('edit_post_image');
-        // $fileName = $file->getFilename();
-        // if ($fileName != '') {
-        //     $fileName = $file->getRandomName();
-        //     // print_r($fileName); die;
-        //     $file->move('assets/images', $fileName);
-        //     if ($this->request->getPost('edit_old_image') != '') {
-        //         unlink('assets/images/' . $this->request->getPost('edit_old_image'));
-        //     }
-        // } else {
-        //     $fileName = $this->request->getPost('edit_old_image');
-        // }
-
         $id = $this->request->getPost('edit_post_id');
         $file = $this->request->getFile('edit_post_image');
-        $oldImage = $this->request->getPost('edit_old_image');
+        $fileName = $file->getFilename();
+        if ($fileName != '') {
+            // $fileName = $file->getRandomName();
+            $ext = $file->getExtension(); // Get the original file extension
+            $fileName = uniqid() . '.' . $ext; // Generate a unique filename
 
-        if ($file && $file->isValid()) {
-            $fileName = $file->getRandomName();
             $file->move('assets/images', $fileName);
-
-            // Remove the old image file if it exists
-            if ($oldImage && file_exists('assets/images/' . $oldImage)) {
-                unlink('assets/images/' . $oldImage);
+            if ($this->request->getPost('edit_old_image') != '') {
+                unlink('assets/images/' . $this->request->getPost('edit_old_image'));
             }
         } else {
-            // If no new file is uploaded, keep the old image filename
-            $fileName = $oldImage;
+            $fileName = $this->request->getPost('edit_old_image');
         }
 
         $rules = [
             'edit_post_title' => 'required|min_length[3]|max_length[55]',
             'edit_post_category' => 'required|min_length[3]|max_length[25]',
             'edit_post_body' => 'required|max_length[150]',
-            'file' => 'uploaded[post_image]|max_size[post_image,1024]|is_image[post_image]|mime_in[post_image,image/jpg,image/jpeg,image/png]',
         ];
         $messages = [
             'edit_post_title' => [
@@ -362,6 +359,10 @@ class Employee extends BaseController
         } else {
             // $file->move('assets/images', $fileName);
             $this->post->update($id, $updatePost);
+            // Delete the old image if a new image is uploaded and the old image exists
+            // if ($file->isValid() && !$file->hasMoved() && $oldImage != '') {
+            //     unlink('uploads/avatar/' . $oldImage);
+            // }
             return $this->response->setJSON([
                 'error' => false,
                 'message' => 'Post Updated Successfully.'

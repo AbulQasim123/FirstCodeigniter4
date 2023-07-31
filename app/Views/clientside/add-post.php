@@ -142,4 +142,24 @@
 </div>
 <!-- delete post modal end -->
 
+
+<!-- detail post modal start -->
+<div id="detail_post_modal" class="modal" style="max-height: 100%;">
+	<div class="modal-content">
+		<h5>Detail Post</h5>
+		<div class="divider"></div>
+		<div class="row">
+			<img src="" id="detail_post_image" style="padding: 10px; width: 100%; height: 200px;">
+			<h3 id="detail_post_title"></h3>
+			<h5 id="detail_post_category"></h5>
+			<p id="detail_post_body"></p>
+			<p id="detail_post_created" style="font-style: italic;"></p>
+		</div>
+	</div>
+	<div class="modal-footer">
+		<a href="#!" class="modal-close waves-effect waves-green btn-flat">ok</a>
+	</div>
+</div>
+<!-- detail post modal end -->
+          
 <?= $this->endSection() ?>

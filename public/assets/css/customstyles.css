@@ -19,9 +19,22 @@
     overflow-y: scroll;
 }
 
+
+/**
+ * CSS class for setting the height of an image element with the ID.
+ * 
+ * The #post_image class sets the height of an image element with the ID "post_image" to 200 pixels.
+ */
 #post_image{
     height: 200px;
 }
+
+/**
+ * CSS class for styling the footer section of a card element.
+ * 
+ * The #card-footer class sets the height of the footer to 60 pixels
+ * and applies a light gray background color to it.
+ */
 #card-footer{
     height: 60px;
     background-color: #eee;
