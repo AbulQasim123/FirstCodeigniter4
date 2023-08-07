@@ -119,7 +119,7 @@
 			</div>
 		</div>
 		<div class="modal-footer">
-			<button type="submit" class="btn waves-effect waves-light" id="add_post_btn">Update</button>
+			<button type="submit" class="btn waves-effect waves-light" id="edit_post_btn">Update</button>
 			<a href="javascript:;" class="modal-close btn waves-effect blue-grey darken-3">Cancil</a>
 		</div>
 	</form>
@@ -134,7 +134,7 @@
 		</div>
 		<div class="modal-footer">
 			<div class="center-align" style="margin-top: -10px">
-				<button type="submit" class="btn waves-effect waves-light" id="add_post_btn">Agree</button>
+				<button type="submit" class="btn waves-effect waves-light" id="delete_post_btn">Agree</button>
 				<a href="javascript:;" class="modal-close btn waves-effect blue-grey darken-3">Disagree</a>
 			</div>
 		</div>

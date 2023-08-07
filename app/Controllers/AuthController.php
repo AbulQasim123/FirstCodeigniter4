@@ -6,6 +6,7 @@ use App\Models\UserModel;
 use App\Controllers\BaseController;
 use App\Models\Employee as EmployeeModel;
 use App\Validation\UserRules;
+use \Hermawan\DataTables\DataTable;
 
 class AuthController extends BaseController
 {
@@ -62,7 +63,6 @@ class AuthController extends BaseController
                 ]);
             } else {
                 $model = new UserModel();
-
                 $newData = [
                     'name' => $this->request->getVar('name'),
                     'email' => $this->request->getVar('email'),
@@ -139,8 +139,21 @@ class AuthController extends BaseController
     // User Dashboard
     public function userDashboard()
     {
-        $employees = $this->employee->findAll();
-        return view('dashboard/dashboard', ['employees' => $employees]);
+        return view('dashboard/dashboard');
+    }
+    // Controller function to load employee data and generate JSON response for DataTables
+    public function loadEmployee()
+    {
+        $db = db_connect();
+        $list_employee = $db->table('employees')->select('*')->get()->getResultArray();
+        $data = [];
+        foreach ($list_employee as $employee) {
+            $editButton = '<a href="' . base_url('serverside/edit-employee/' . $employee['id']) . '" class="btn-floating btn-small waves-effect waves-light pink"><i class="material-icons">edit</i></a>';
+            $deleteButton = '<a href="' . base_url('serverside/del-employee/' . $employee['id']) . '" class="btn-floating btn-small waves-effect waves-light red" onclick="return confirm(\'Are you sure want to delete?\')"><i class="tiny material-icons">delete</i></a>';
+            $employee['actions'] = $editButton . ' ' . $deleteButton;
+            $data[] = $employee;
+        }
+        return $this->response->setJSON(['data' => $data]);
     }
 
     // User Profile
@@ -148,7 +161,6 @@ class AuthController extends BaseController
     {
         $data = [];
         $model = new UserModel();
-
         $data['user'] = $model->where('id', session()->get('id'))->first();
         return view('dashboard/profile', $data);
     }

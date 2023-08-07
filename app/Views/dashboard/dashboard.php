@@ -24,7 +24,7 @@
                 </div>
             </div>
             <div class="card-action">
-                <table class="highlight responsive-table">
+                <table class="highlight responsive-table" id="load_table">
                     <thead>
                         <tr>
                             <th>#</th>
@@ -39,39 +39,14 @@
                         </tr>
                     </thead>
                     <tbody>
-                        <?php
-                        if (count($employees)) {
-                            $i = 1;
-                            foreach ($employees as $employee) { ?>
-                                <tr>
-                                    <td><?= $i++ ?></td>
-                                    <td><?= $employee['name'] ?></td>
-                                    <td><?= $employee['email'] ?></td>
-                                    <td><?= $employee['gender'] ?></td>
-                                    <td><?= $employee['date_of_birth'] ?></td>
-                                    <td><?= $employee['mobile_no'] ?></td>
-                                    <td><?= $employee['designation'] ?></td>
-                                    <td><?= $employee['address'] ?></td>
-
-                                    <td>
-                                        <a href="<?= base_url('serverside/edit-employee/' . $employee['id']); ?>" class="btn-floating btn-small waves-effect waves-light pink"><i class="material-icons">edit</i></a>
-                                        <a href="<?= base_url('serverside/del-employee/' . $employee['id']); ?>" class="btn-floating btn-small waves-effect waves-light red" onclick="return confirm('Are you sure want to delete?')">
-                                            <i class="tiny material-icons">delete</i>
-                                        </a>
-                                    </td>
-                                </tr>
-                            <?php }
-                        } else {
-                            ?>
-                            <tr>
-                                <td class="red-text">Not Found</td>
-                            </tr>
-
-                        <?php } ?>
+                        
                     </tbody>
                 </table>
             </div>
         </div>
     </div>
 </div>
+<script>
+    
+</script>
 <?= $this->endSection() ?>

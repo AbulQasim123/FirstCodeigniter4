@@ -1,10 +1,11 @@
 $(document).ready(function () {
   // Add new post using Ajax
+  var base_url = "http://localhost:2025/";
   $("#add_post_form").submit(function (e) {
     e.preventDefault();
     var formData = new FormData($("#add_post_form")[0]);
     $.ajax({
-      url: "http://localhost:2025/serverside/add-post",
+      url: base_url + "serverside/add-post",
       method: "POST",
       data: formData,
       processData: false,
@@ -36,7 +37,7 @@ $(document).ready(function () {
     e.preventDefault();
     const id = $(this).attr("id");
     $.ajax({
-      url: "http://localhost:2025/serverside/edit-post/" + id,
+      url: base_url + "serverside/edit-post/" + id,
       method: "get",
       success: function (response) {
         // console.log(response);
@@ -46,10 +47,10 @@ $(document).ready(function () {
         $("#edit_post_category").val(response.message.post_category);
         $("#edit_post_body").val(response.message.post_body);
         $("#old_image_preview").html(
-          '<img src="http://localhost:2025/assets/images/' +
+          '<img src="' + base_url + 'assets/images/' +
             response.message.post_image +
             '" class="card-image" width="100" height="50">'
-        );
+        );        
       },
     });
   });
@@ -59,7 +60,7 @@ $(document).ready(function () {
     e.preventDefault();
     var formData = new FormData($("#edit_post_form")[0]);
     $.ajax({
-      url: "http://localhost:2025/serverside/update-post",
+      url: base_url + "serverside/update-post",
       method: "post",
       data: formData,
       contentType: false,
@@ -90,7 +91,7 @@ $(document).ready(function () {
     $("#delete_post_form").submit(function (e) {
       e.preventDefault();
       $.ajax({
-        url: "http://localhost:2025/serverside/delete-post/" + id,
+        url: base_url + "serverside/delete-post/" + id,
         method: "get",
         success: function (response) {
           console.log(response);
@@ -109,12 +110,11 @@ $(document).ready(function () {
     e.preventDefault();
     const id = $(this).attr("id");
     $.ajax({
-      url: "http://localhost:2025/serverside/detail-post/" + id,
+      url: base_url + "serverside/detail-post/" + id,
       method: "get",
 			dataType: 'json',
       success: function (response) {
-        console.log(response);
-				$("#detail_post_image").attr('src', 'http://localhost:2025/assets/images/' + response.message.post_image);
+				$("#detail_post_image").attr('src', base_url + 'assets/images/' + response.message.post_image);
 				$("#detail_post_title").text(response.message.post_title);
 				$("#detail_post_category").text(response.message.post_category);
 				$("#detail_post_body").text(response.message.post_body);
@@ -128,11 +128,39 @@ $(document).ready(function () {
   function fetchAllPosts() {
     $.ajax({
       type: "get",
-      url: "http://localhost:2025/serverside/fetch-all-post",
+      url: base_url + "serverside/fetch-all-post",
       success: function (response) {
         $("#show_posts").html(response.message);
       },
     });
   }
-});
 
+  // load Employee data
+  $('#load_table').DataTable({
+    processing: true,
+    serverside: true,
+    lengthChange: true,
+    order: [],
+    ajax: {
+      url: base_url + "load-employee",
+      type: 'GET'
+    },
+    columns: [
+      {
+        data: null,
+        render: function (data, type, row, meta) {
+          return meta.row + 1;
+        },
+      },
+      { data: 'name' },
+      { data: 'email' },
+      { data: 'gender' },
+      { data: 'date_of_birth' },
+      { data: 'mobile_no' },
+      { data: 'designation' },
+      { data: 'address' },
+      { data: 'actions' },
+    ]
+  });
+  
+});

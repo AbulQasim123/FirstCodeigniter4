@@ -43,8 +43,10 @@ $routes->get('/first-app', function(){
 $routes->match(['get','post'], 'register', [AuthController::class,'userRegister'],['filter' => 'noauth']);
 $routes->match(['get','post'], 'login',[AuthController::class,'userLogin'],['filter' => 'noauth']);
 $routes->get('dashboard',[AuthController::class,'userDashboard'],['filter' => 'auth']);
+$routes->get('load-employee',[AuthController::class,'loadEmployee'],['filter' => 'auth']);
 $routes->get('profile',[AuthController::class,'userProfile'],['filter'=> 'auth']);
 $routes->get('logout',[AuthController::class,'userLogout']);
+
 
 // Crud Employee routes
 $routes->group('serverside', ['filter' => 'auth'], function ($routes) {
