@@ -110,7 +110,7 @@
 							<input type="file" name="edit_post_image" id="edit_post_image">
 						</div>
 						<div class="file-path-wrapper">
-							<input class="file-path validate" type="text" placeholder="Upload file">
+							<input class="file-path validate" type="text" placeholder="Upload Image">
 						</div>
 						<span id="edit_post_image_error" class="red-text"></span>
 						<div id="old_image_preview"></div>

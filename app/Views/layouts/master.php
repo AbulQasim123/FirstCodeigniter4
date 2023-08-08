@@ -15,7 +15,12 @@
     <link href="<?= base_url('assets/css/customstyles.css'); ?>" rel="stylesheet" type="text/css" />
     <!-- DataTables CSS -->
     <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css">
-    
+    <!-- Sweetalert library file -->
+    <link href="https://cdn.jsdelivr.net/npm/sweetalert2@9.17.2/dist/sweetalert2.min.css" rel="stylesheet" />
+
+    <style>
+        
+    </style>
 </head>
 
 <body>
@@ -33,6 +38,8 @@
         </div>
     </div>
 
+
+
     <!-- Compiled and minified Jquery -->
     <script src="https://code.jquery.com/jquery-3.7.0.min.js" integrity="sha256-2Pmvv0kuTBOenSvLm6bvfBSSHrUJ+3A7x6P5Ebd07/g=" crossorigin="anonymous"></script>
 
@@ -47,6 +54,10 @@
     <script type="text/javascript" src="<?= base_url('assets/js/materialize.js'); ?>"></script>
     <script type="text/javascript" src="<?= base_url('assets/js/customscripts.js'); ?>"></script>
 
+    <!-- Validation library file -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validate/1.19.2/jquery.validate.min.js"></script>
+    <!-- Sweetalert library file -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@9.17.2/dist/sweetalert2.min.js"></script>
 
 </body>
 

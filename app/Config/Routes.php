@@ -4,6 +4,7 @@ namespace Config;
 
 use App\Controllers\AuthController;
 use App\Controllers\Employee as EmployeeController;
+use App\Controllers\CrudApiController;
 // Create a new instance of our RouteCollection class.
 $routes = Services::routes();
 
@@ -34,35 +35,48 @@ $routes->set404Override();
 $routes->get('/', 'Home::index');
 
 // Development routes
-$routes->get('/first-app', function(){
+$routes->get('/first-app', function () {
     echo "<h1 align='center' style='color:blue;'>Hello Codeigniter</h1>";
 });
 
 // Login & Registration routes
 // $routes->match(['get', 'post'], 'register', 'UserController::userRegister', ['filter' => 'noauth']);
-$routes->match(['get','post'], 'register', [AuthController::class,'userRegister'],['filter' => 'noauth']);
-$routes->match(['get','post'], 'login',[AuthController::class,'userLogin'],['filter' => 'noauth']);
-$routes->get('dashboard',[AuthController::class,'userDashboard'],['filter' => 'auth']);
-$routes->get('load-employee',[AuthController::class,'loadEmployee'],['filter' => 'auth']);
-$routes->get('profile',[AuthController::class,'userProfile'],['filter'=> 'auth']);
-$routes->get('logout',[AuthController::class,'userLogout']);
+$routes->match(['get', 'post'], 'register', [AuthController::class, 'userRegister'], ['filter' => 'noauth']);
+$routes->match(['get', 'post'], 'login', [AuthController::class, 'userLogin'], ['filter' => 'noauth']);
+$routes->get('dashboard', [AuthController::class, 'userDashboard'], ['filter' => 'auth']);
+$routes->get('load-employee', [AuthController::class, 'loadEmployee'], ['filter' => 'auth']);
+$routes->get('profile', [AuthController::class, 'userProfile'], ['filter' => 'auth']);
+$routes->get('logout', [AuthController::class, 'userLogout']);
 
 
 // Crud Employee routes
 $routes->group('serverside', ['filter' => 'auth'], function ($routes) {
     // server side crud
-    $routes->match(['get', 'post'], 'add-employee', [EmployeeController::class,'addEmployee']);
+    $routes->match(['get', 'post'], 'add-employee', [EmployeeController::class, 'addEmployee']);
     $routes->match(['get', 'post'], 'edit-employee/(:num)', [EmployeeController::class, 'editEmployee']);
     $routes->get('del-employee/(:num)', [EmployeeController::class, 'deleteEmployee']);
-    
+
     // client side crud
-    $routes->match(['get', 'post'], 'add-post', [EmployeeController::class,'addPost']);
-    $routes->get('fetch-all-post', [EmployeeController::class,'fetchAllPost']);
-    $routes->get('edit-post/(:num)', [EmployeeController::class,'editPost']);
-    $routes->post('update-post', [EmployeeController::class,'updatePost']);
-    $routes->get('delete-post/(:num)', [EmployeeController::class,'deletePost']);
-    $routes->get('detail-post/(:num)', [EmployeeController::class,'detailPost']);
+    $routes->match(['get', 'post'], 'add-post', [EmployeeController::class, 'addPost']);
+    $routes->get('fetch-all-post', [EmployeeController::class, 'fetchAllPost']);
+    $routes->get('edit-post/(:num)', [EmployeeController::class, 'editPost']);
+    $routes->post('update-post', [EmployeeController::class, 'updatePost']);
+    $routes->get('delete-post/(:num)', [EmployeeController::class, 'deletePost']);
+    $routes->get('detail-post/(:num)', [EmployeeController::class, 'detailPost']);
+
+
+    // Here are About Images Uploading routes
+    $routes->match(['get','post'],'img-uploads', [EmployeeController::class, 'uploadImage'], ['as' => 'img-uploads']);
 });
+
+ // Crud Rest API Development
+ $routes->group('api',function($routes){
+    $routes->get('fetch', [CrudApiController::class, 'fetch']);
+    $routes->post('create', [CrudApiController::class, 'create']);
+    $routes->get('show/(:num)', [CrudApiController::class, 'show']);
+    $routes->post('update/(:num)', [CrudApiController::class, 'update']);
+    $routes->get('delete/(:num)', [CrudApiController::class, 'delete']);
+ });
 
 /*
  * --------------------------------------------------------------------

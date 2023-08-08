@@ -5,19 +5,23 @@ namespace App\Controllers;
 use App\Controllers\BaseController;
 use App\Models\Employee as EmployeeModel;
 use App\Models\PostModel;
-
+use App\Models\ImgUploadModel;
 class Employee extends BaseController
 {
+    // Initialize the model
     protected $employee;
     protected $post;
+    protected $imgUpload;
     public function __construct()
     {
         $this->employee = new EmployeeModel();
         $this->post = new PostModel();
+        $this->imgUpload = new ImgUploadModel();
     }
 
     public function addEmployee()
     {
+        $email = \Config\Services::email();
         if ($this->request->getMethod() == 'post') {
             $addEmployee = [
                 'name' => $this->request->getVar('name'),
@@ -77,6 +81,21 @@ class Employee extends BaseController
             } else {
                 if ($this->employee->save($addEmployee) === true) {
                     session()->setFlashdata('success', 'Employee Added Successfully.');
+                    $email->setTo('qasim.cloudzurf@gmail.com');
+                    $email->setFrom('AbulQasim Ansari');
+
+                    // If you need to send mail to CC and BCC
+                    // $email->setCC('another@another-user.com');
+                    // $email->setBCC('other@other-user.com');
+
+                    $email->setSubject('This is Simple Mail');
+                    $email->setMessage('This is Simple Mail send by CodeIgniter 4');
+                    if ($email->send()) {
+                        session()->setFlashdata('error', 'Mail has been Sent Successfully!');
+                    } else {
+                        $data = $email->printDebugger(['header']);
+                        print_r($data);
+                    }
                     return redirect()->to(base_url('dashboard'));
                 } else {
                     session()->setFlashdata('error', 'Somethings went wrong!');
@@ -291,7 +310,7 @@ class Employee extends BaseController
         ]);
     }
 
-    
+
     // handle detail post ajax request
     public function detailPost($id = null)
     {
@@ -382,5 +401,64 @@ class Employee extends BaseController
                 'message' => 'Post Deleted Successfully!'
             ]);
         }
+    }
+
+    // Here are About Image uploading
+    public function uploadImage() {
+        if($this->request->getMethod() == "post"){
+            $rules = [
+                'name' => 'required',
+                'email' => 'required|valid_email|is_unique[users.email]|max_length[50]|min_length[6]',
+                'mobile' => 'required|numeric|max_length[10]',
+                'image' => [
+                    "rules" => "uploaded[image]|max_size[image,1024]|is_image[image]|mime_in[image,image/jpg,image/jpeg,image/gif,image/png]",
+					"label" => "Profile Image",
+                ],
+            ];
+
+            if(!$this->validate($rules)){
+                $response = [
+                    'success' => false,
+                    'messages' => $this->validator->getErrors()
+                ];
+                return $this->response->setJSON($response);
+            }else{
+                $image = $this->request->getFile('image');
+                $pro_image = $image->getName();
+
+                // Renaming file before upload
+                $temp = explode(".",$pro_image);
+                $newImage = round(microtime(true)). "." . end($temp);
+
+                if($image->move('uploads/Images', $newImage)){
+                    $data = [
+                        'name' => $this->request->getVar('name'),
+                        'email' => $this->request->getVar('email'),
+                        'mobile' => $this->request->getVar('mobile'),
+                        'image' => 'uploads/Images/' . $newImage
+                    ];
+
+                    if($this->imgUpload->insert($data)){
+                        $response = [
+                            'success' => true,
+                            'messages' => 'Data Uploaded Successfully'
+                        ];
+                    }else{
+                        $response = [
+                            'success' => false,
+                            'messages' => 'Data Uploaded Successfully'
+                        ];
+                    }
+                    return $this->response->setJSON($response);
+                }else{
+                    $response = [
+                        'success' => false,
+                        'messages' => 'Failed to upload Data'
+                    ];
+                    return $this->response->setJSON($response);
+                }
+            }
+        }
+        return view('clientside/img-upload');
     }
 }
