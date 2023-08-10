@@ -50,7 +50,10 @@ input[type=search]:not(.browser-default) {
     height: auto;
 }
 
-#load_table_length select{
+#load_table_length, #Load_table_length select{
     display: block;
     height: 2rem;
+}
+#Load_table_length select{
+    width: 200%;
 }

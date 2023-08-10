@@ -2,23 +2,23 @@ $(document).ready(function () {
   // Here are our Custom Functions for displaying Form Errors Messages
   function clearErrorMessages() {
     // Add Post Form Clear Messages
-   $("#post_title_error").text("");
-   $("#post_category_error").text("");
-   $("#post_body_error").text("");
-   $("#post_image_error").text("");
+    $("#post_title_error").text("");
+    $("#post_category_error").text("");
+    $("#post_body_error").text("");
+    $("#post_image_error").text("");
 
-   // Edit Post Form Clear Messages
-   $("#edit_post_title_error").text("");
-   $("#edit_post_category_error").text("");
-   $("#edit_post_body_error").text("");
-   $("#edit_post_image_error").text("");
+    // Edit Post Form Clear Messages
+    $("#edit_post_title_error").text("");
+    $("#edit_post_category_error").text("");
+    $("#edit_post_body_error").text("");
+    $("#edit_post_image_error").text("");
 
-   // About Image uploading Clear Messages
-   $("#name_error").text("");
-   $("#email_error").text("");
-   $("#mobile_error").text("");
-   $("#image_error").text("");
- }
+    // About Image uploading Clear Messages
+    $("#name_error").text("");
+    $("#email_error").text("");
+    $("#mobile_error").text("");
+    $("#image_error").text("");
+  }
   // Add new post using Ajax
   var base_url = "http://localhost:2025/";
   $("#add_post_form").submit(function (e) {
@@ -215,4 +215,36 @@ $(document).ready(function () {
       },
     });
   });
+
+  //  Server Side DataTable
+  $(document).ready( function () {
+
+    $('#Load_table').DataTable({
+      bProcessing: true,
+      serverSide: true,
+      scrollY: "400px",
+      scrollCollapse: true,
+      ajax: {
+        url: base_url + "serverside/ajax-loadData", // json datasource
+        type: "post",
+        data: {
+          // key1: value1 - in case if we want send data with request
+        }
+      },
+      columns: [
+        { data: "id" },
+        { data: "name" },
+        { data: "email" },
+        { data: "mobile" },
+        { data: "designation" },
+        { data: "gender" },
+        { data: "status" },
+
+      ],
+      columnDefs: [
+        { orderable: false, targets: [0, 1, 2, 3,4,5,6] }
+      ],
+      bFilter: true, // to display datatable search
+    });
+});
 });

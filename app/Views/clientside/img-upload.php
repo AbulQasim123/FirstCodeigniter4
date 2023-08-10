@@ -6,7 +6,7 @@
         <div class="card-content">
             <div class="row">
                 <div class="col s10">
-                    <div class="card-title">Here are About Images uploading</div>
+                    <div class="card-title">Here are About (Images uploading,Serverside Datatable, Generate Pdf)</div>
                 </div>
                 <div class="col s2 right-align">
                 </div>
@@ -51,8 +51,28 @@
                 </div>
                 <button type="submit" class="btn waves-effect waves-light">Save</button>
             </form>
-
         </div>
     </div>
+
+    <!--  Server Side DataTable  -->
+    <div class="right-align" style="margin-bottom: 10px;">
+        <a href="<?= route_to('generate.pdf') ?>" class="btn waves-effect waves-light">
+            Download PDF
+        </a>
+    </div>
+    <table class="responsive-table striped centered" id="Load_table">
+        <thead>
+            <tr>
+                <th>Id</th>
+                <th>Name</th>
+                <th>Email</th>
+                <th>Mobile</th>
+                <th>Designation</th>
+                <th>Gender</th>
+                <th>Status</th>
+            </tr>
+        </thead>
+    </table>
+
 </div>
 <?= $this->endSection() ?>

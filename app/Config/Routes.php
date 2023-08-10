@@ -67,6 +67,13 @@ $routes->group('serverside', ['filter' => 'auth'], function ($routes) {
 
     // Here are About Images Uploading routes
     $routes->match(['get','post'],'img-uploads', [EmployeeController::class, 'uploadImage'], ['as' => 'img-uploads']);
+
+    //  Server Side DataTable 
+    $routes->post("ajax-loadData", [EmployeeController::class,'ajaxLoadData']);
+    // Generate PDF
+    $routes->get("generate-pdf", [EmployeeController::class,'generatePDF'], ['as' => 'generate.pdf']);
+
+
 });
 
  // Crud Rest API Development

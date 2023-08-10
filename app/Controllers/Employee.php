@@ -6,17 +6,24 @@ use App\Controllers\BaseController;
 use App\Models\Employee as EmployeeModel;
 use App\Models\PostModel;
 use App\Models\ImgUploadModel;
+use App\Models\DatatableModel;
+use Dompdf\Dompdf;
+
 class Employee extends BaseController
 {
     // Initialize the model
     protected $employee;
     protected $post;
     protected $imgUpload;
+    protected $datatable;
+    protected $db;
     public function __construct()
     {
         $this->employee = new EmployeeModel();
         $this->post = new PostModel();
         $this->imgUpload = new ImgUploadModel();
+        $this->datatable = new DatatableModel();
+        $this->db = \Config\Database::connect();
     }
 
     public function addEmployee()
@@ -404,33 +411,50 @@ class Employee extends BaseController
     }
 
     // Here are About Image uploading
-    public function uploadImage() {
-        if($this->request->getMethod() == "post"){
+    public function uploadImage()
+    {
+        if ($this->request->getMethod() == "post") {
             $rules = [
                 'name' => 'required',
                 'email' => 'required|valid_email|is_unique[users.email]|max_length[50]|min_length[6]',
-                'mobile' => 'required|numeric|max_length[10]',
+                'mobile' => 'required|numeric|checkLength[mobile]|mobileValidation[mobile]|is_unique[imguploads.mobile]',
                 'image' => [
                     "rules" => "uploaded[image]|max_size[image,1024]|is_image[image]|mime_in[image,image/jpg,image/jpeg,image/gif,image/png]",
-					"label" => "Profile Image",
+                    "label" => "Profile Image",
                 ],
             ];
 
-            if(!$this->validate($rules)){
+            $messages = [
+				"name" => [
+					"required" => "Mobile number required"
+				],
+				"email" => [
+					"required" => "Email required"
+				],
+                "mobile" => [
+					"required" => "Mobile Number is required",
+                    "numeric" => "Accept Only Number",
+                    "checkLength" => "Mobile number must be of 10 digits",
+					"mobileValidation" => "Number must be start from 5-9",
+					"is_unique" => "Mobile number already exists"
+                ],
+			];
+
+            if (!$this->validate($rules,$messages)) {
                 $response = [
                     'success' => false,
                     'messages' => $this->validator->getErrors()
                 ];
                 return $this->response->setJSON($response);
-            }else{
+            } else {
                 $image = $this->request->getFile('image');
                 $pro_image = $image->getName();
 
                 // Renaming file before upload
-                $temp = explode(".",$pro_image);
-                $newImage = round(microtime(true)). "." . end($temp);
+                $temp = explode(".", $pro_image);
+                $newImage = round(microtime(true)) . "." . end($temp);
 
-                if($image->move('uploads/Images', $newImage)){
+                if ($image->move('uploads/Images', $newImage)) {
                     $data = [
                         'name' => $this->request->getVar('name'),
                         'email' => $this->request->getVar('email'),
@@ -438,19 +462,19 @@ class Employee extends BaseController
                         'image' => 'uploads/Images/' . $newImage
                     ];
 
-                    if($this->imgUpload->insert($data)){
+                    if ($this->imgUpload->insert($data)) {
                         $response = [
                             'success' => true,
                             'messages' => 'Data Uploaded Successfully'
                         ];
-                    }else{
+                    } else {
                         $response = [
                             'success' => false,
                             'messages' => 'Data Uploaded Successfully'
                         ];
                     }
                     return $this->response->setJSON($response);
-                }else{
+                } else {
                     $response = [
                         'success' => false,
                         'messages' => 'Failed to upload Data'
@@ -460,5 +484,54 @@ class Employee extends BaseController
             }
         }
         return view('clientside/img-upload');
+    }
+
+    //  Server Side DataTable 
+    public function ajaxLoadData()
+    {
+        $draw = $this->request->getVar('draw');
+        $start = $this->request->getVar('start');
+        $length = $this->request->getVar('length');
+        $search_value = $this->request->getVar('search')['value'];
+
+        $query = $this->db->table('datatables');
+
+        if (!empty($search_value)) {
+            $query->like('id', $search_value)
+                ->orLike('name', $search_value)
+                ->orLike('email', $search_value)
+                ->orLike('mobile', $search_value)
+                ->orlike('designation', $search_value)
+                ->orlike('gender', $search_value)
+                ->orlike('status', $search_value);
+
+            $total_count = $query->countAllResults(false); // false for unformatted count
+            $data = $query->get($length, $start)->getResult();
+        } else {
+            $total_count = $query->countAllResults(false); // false for unformatted count
+            $data = $query->get($length, $start)->getResult();
+        }
+
+        $json_array = array(
+            'draw' => intval($draw),
+            'recordsTotal' => $total_count,
+            'recordsFiltered' => $total_count,
+            'data' => $data
+        );
+
+        return $this->response->setJSON($json_array);
+    }
+
+    // Generate PDF
+    public function generatePDF()
+    {
+        $dompdf = new \Dompdf\Dompdf();
+        $data = $this->db->table('datatables')->get()->getResult();
+        // Sending data to view file
+        $dompdf->loadHtml(view('pdf/pdf-file', ['datas' => $data]));
+        $dompdf->setPaper('A4', 'landscape');
+        $dompdf->render();
+        $dompdf->stream('document');
+        return redirect()->to(base_url('img-uploads'));
     }
 }
