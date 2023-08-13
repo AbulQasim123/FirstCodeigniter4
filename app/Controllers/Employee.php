@@ -425,22 +425,22 @@ class Employee extends BaseController
             ];
 
             $messages = [
-				"name" => [
-					"required" => "Mobile number required"
-				],
-				"email" => [
-					"required" => "Email required"
-				],
+                "name" => [
+                    "required" => "Mobile number required"
+                ],
+                "email" => [
+                    "required" => "Email required"
+                ],
                 "mobile" => [
-					"required" => "Mobile Number is required",
+                    "required" => "Mobile Number is required",
                     "numeric" => "Accept Only Number",
                     "checkLength" => "Mobile number must be of 10 digits",
-					"mobileValidation" => "Number must be start from 5-9",
-					"is_unique" => "Mobile number already exists"
+                    "mobileValidation" => "Number must be start from 5-9",
+                    "is_unique" => "Mobile number already exists"
                 ],
-			];
+            ];
 
-            if (!$this->validate($rules,$messages)) {
+            if (!$this->validate($rules, $messages)) {
                 $response = [
                     'success' => false,
                     'messages' => $this->validator->getErrors()
@@ -486,7 +486,7 @@ class Employee extends BaseController
         return view('clientside/img-upload');
     }
 
-    //  Server Side DataTable 
+    //  Server Side DataTable
     public function ajaxLoadData()
     {
         $draw = $this->request->getVar('draw');
@@ -537,21 +537,23 @@ class Employee extends BaseController
 
 
     // Read and Write Files
-    public function readFile(){
+    public function readFile()
+    {
         // Type #1 - This file will be created inside /public folder
         $file_contents = "This is a wirte test file";
         write_file('test1.txt', $file_contents);
         // Type #2 - This file will be created inside /writable folder
         write_file(WRITEPATH.'test2.txt', $file_contents);
         // Type #3 - This file will be created inside /public folder and return value
-        if(!write_file('test3.txt', $file_contents)){
+        if(!write_file('test3.txt', $file_contents)) {
             echo "Failed to write file";
-        }else{
+        } else {
             echo "File written Successfully.";
         }
     }
-    
-    public function writeFile(){
+
+    public function writeFile()
+    {
         // Type #1 - Read file from public folder
         $data1 = readFile('./test1.txt');
         print_r($data1);
@@ -562,14 +564,29 @@ class Employee extends BaseController
     }
 
     // How to get Local IP Address of System
-    public function getIpAddress(){
+    public function getIpAddress()
+    {
         echo getClientIpAddress();
     }
 
 
-    // Google Line Chart Integration
-    public function chartsIntegration(){
-        return view('clientside/charts-integration');
+    // Google Chart Integration
+    public function chartsIntegration()
+    {
+        // line chart
+        $year_wise = $this->db->query("SELECT COUNT(id) as total, YEAR(created_at) as year FROM datatables GROUP BY YEAR(created_at)")->getResult();
+        $data['year_wise_line'] = $year_wise;
+        
+        // Bar chart
+        $year_wise = $this->db->query("SELECT COUNT(id) as total, YEAR(created_at) as year FROM datatables GROUP BY YEAR(created_at)")->getResult();
+        $data['year_wise_bar'] = $year_wise;
+
+        // Pie chart
+        $year_wise = $this->db->query("SELECT COUNT(id) as total, YEAR(created_at) as year FROM datatables GROUP BY YEAR(created_at)")->getResult();
+        $data['year_wise_pie'] = $year_wise;
+
+        
+        return view('clientside/charts-integration', $data);
     }
 }
 

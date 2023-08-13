@@ -10,7 +10,7 @@ class Datatable extends Seeder
     public function run()
     {
         $data = [];
-        for ($i = 1; $i < 50; $i++) {
+        for ($i = 0; $i < 10000; $i++) {
             $data[] = $this->generateDummyData();
         }
         $this->db->table('datatables')->insertBatch($data);
@@ -19,6 +19,9 @@ class Datatable extends Seeder
     public function generateDummyData()
     {
         $faker = Factory::create();
+        $createdDate = $faker->dateTimeBetween('-10 year', 'now')->format('Y-m-d H:i:s');
+        $updatedDate = $faker->dateTimeBetween($createdDate, 'now')->format('Y-m-d H:i:s');
+
         return [
             'name' => $faker->name,
             'email' => $faker->email,
@@ -35,8 +38,8 @@ class Datatable extends Seeder
             ]),
             'gender' => $faker->randomElement(["Male", "Female", "Other"]),
             'status' => $faker->randomElement([0, 1]),
-            'created_at' => date('Y-m-d H:i:s'),
-            'updated_at' => date('Y-m-d H:i:s'),
+            'created_at' => $createdDate,
+            'updated_at' => $updatedDate,
         ];
     }
 }

@@ -5,14 +5,15 @@ namespace App\Controllers;
 use App\Models\UserModel;
 use App\Controllers\BaseController;
 use App\Models\Employee as EmployeeModel;
-use App\Validation\UserRules;
-use \Hermawan\DataTables\DataTable;
+use App\Models\DatatableModel;
 
 class AuthController extends BaseController
 {
     protected $employee;
+    protected $datatable;
     public function __construct()
     {
+        $this->datatable = new DatatableModel();
         $this->employee = new EmployeeModel();
     }
     // User Registration
@@ -138,8 +139,10 @@ class AuthController extends BaseController
 
     // User Dashboard
     public function userDashboard()
-    {
-        return view('dashboard/dashboard');
+    {   
+        $perpage = 50;
+        $datatables = $this->datatable->paginate($perpage);
+        return view('dashboard/dashboard', ['datatables' => $datatables]);
     }
     // Controller function to load employee data and generate JSON response for DataTables
     public function loadEmployee()
