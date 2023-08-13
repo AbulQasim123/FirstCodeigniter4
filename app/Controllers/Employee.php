@@ -534,4 +534,59 @@ class Employee extends BaseController
         $dompdf->stream('document');
         return redirect()->to(base_url('img-uploads'));
     }
+
+
+    // Read and Write Files
+    public function readFile(){
+        // Type #1 - This file will be created inside /public folder
+        $file_contents = "This is a wirte test file";
+        write_file('test1.txt', $file_contents);
+        // Type #2 - This file will be created inside /writable folder
+        write_file(WRITEPATH.'test2.txt', $file_contents);
+        // Type #3 - This file will be created inside /public folder and return value
+        if(!write_file('test3.txt', $file_contents)){
+            echo "Failed to write file";
+        }else{
+            echo "File written Successfully.";
+        }
+    }
+    
+    public function writeFile(){
+        // Type #1 - Read file from public folder
+        $data1 = readFile('./test1.txt');
+        print_r($data1);
+        echo "<br>";
+        // Type #2 - Read file from witeable folder
+        $data2 = readFile(WRITEPATH. 'test2.txt');
+        print_r($data2);
+    }
+
+    // How to get Local IP Address of System
+    public function getIpAddress(){
+        echo getClientIpAddress();
+    }
+
+
+    // Google Line Chart Integration
+    public function chartsIntegration(){
+        return view('clientside/charts-integration');
+    }
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

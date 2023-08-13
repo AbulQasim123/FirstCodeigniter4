@@ -17,7 +17,9 @@ $routes->setDefaultNamespace('App\Controllers');
 $routes->setDefaultController('Home');
 $routes->setDefaultMethod('index');
 $routes->setTranslateURIDashes(false);
-$routes->set404Override();
+$routes->set404Override(function(){
+    return view("404");
+});
 // The Auto Routing (Legacy) is very dangerous. It is easy to create vulnerable apps
 // where controller filters or CSRF protection are bypassed.
 // If you don't want to define all routes, please use the Auto Routing (Improved).
@@ -66,12 +68,22 @@ $routes->group('serverside', ['filter' => 'auth'], function ($routes) {
 
 
     // Here are About Images Uploading routes
-    $routes->match(['get','post'],'img-uploads', [EmployeeController::class, 'uploadImage'], ['as' => 'img-uploads']);
-
+    $routes->match(['get','post'],'img-uploads', [EmployeeController::class, 'uploadImage'], ['as' => 'img.uploads']);
     //  Server Side DataTable 
     $routes->post("ajax-loadData", [EmployeeController::class,'ajaxLoadData']);
     // Generate PDF
     $routes->get("generate-pdf", [EmployeeController::class,'generatePDF'], ['as' => 'generate.pdf']);
+    // Read and Write Files
+    $routes->get("write-file", [EmployeeController::class,'readFile']);
+    $routes->get("read-file", [EmployeeController::class,'writeFile']);
+
+    // How to get Local IP Address of System
+    $routes->get("get-ip-add", [EmployeeController::class,'getIpAddress']);
+
+    // Google Line Chart Integration
+    $routes->get("charts-integration", [EmployeeController::class,'chartsIntegration'],['as' => 'charts.integration']);
+
+    
 
 
 });
