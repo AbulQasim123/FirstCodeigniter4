@@ -24,7 +24,6 @@
                 </div>
             </div>
             <div class="card-action">
-
                 <div class="row">
                     <div class="col s12">
                         <ul class="tabs">
@@ -34,7 +33,15 @@
                     </div>
                     <div class="char-container">
                         <div id="datatable" class="col s12">
-                            <h5>DataTable</h5>
+                            <div class="row">
+                                <div class="col s10">
+                                    <h5>DataTable</h5>
+                                </div>
+                                <div class="col s2 right-align">
+                                    <a title="Download Excel" href="<?= route_to('download.excel') ?> ?>" class="btn-floating waves-effect waves-light grenn"><i class="small material-icons">file_download</i></a>
+                                </div>
+                            </div>
+
                             <table class="highlight responsive-table" id="load_table">
                                 <thead>
                                     <tr>
@@ -87,7 +94,6 @@
                         </div>
                     </div>
                 </div>
-
             </div>
         </div>
     </div>

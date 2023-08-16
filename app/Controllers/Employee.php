@@ -9,6 +9,10 @@ use App\Models\ImgUploadModel;
 use App\Models\DatatableModel;
 use Dompdf\Dompdf;
 
+// import Excel package
+use PhpOffice\PhpSpreadsheet\Spreadsheet;
+use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
+
 class Employee extends BaseController
 {
     // Initialize the model
@@ -526,7 +530,7 @@ class Employee extends BaseController
     public function generatePDF()
     {
         $dompdf = new \Dompdf\Dompdf();
-        $data = $this->db->table('datatables')->get()->getResult();
+        $data = $this->db->table('datatables')->limit(1000)->get()->getResult();
         // Sending data to view file
         $dompdf->loadHtml(view('pdf/pdf-file', ['datas' => $data]));
         $dompdf->setPaper('A4', 'landscape');
@@ -534,6 +538,48 @@ class Employee extends BaseController
         $dompdf->stream('document');
         return redirect()->to(base_url('img-uploads'));
     }
+
+    // Download Excel
+    public function downloadExcel()
+    {
+        $data = $this->db->table('datatables')->get()->getResult();
+        $fileName = 'report.xlsx';
+        $spreadsheet = new Spreadsheet();
+        $sheet = $spreadsheet->getActiveSheet();
+        $sheet->setCellValue('A1', 'ID');
+        $sheet->setCellValue('B1', 'Name');
+        $sheet->setCellValue('C1', 'Email');
+        $sheet->setCellValue('D1', 'Mobile');
+        $sheet->setCellValue('E1', 'Designation');
+        $sheet->setCellValue('F1', 'Gender');
+        // $sheet->setCellValue('F1', 'Mobile');
+        // $sheet->setCellValue('H1', 'Address');
+        $row = 2;
+        foreach ($data as $key => $value) {
+            $sheet->setCellValue('A' . $row, $value->id);
+            $sheet->setCellValue('B' . $row, $value->name);
+            $sheet->setCellValue('C' . $row, $value->email);
+            $sheet->setCellValue('D' . $row, $value->mobile);
+            $sheet->setCellValue('E' . $row, $value->designation);
+            $sheet->setCellValue('F' . $row, $value->gender);
+            // $sheet->setCellValue('E' . $row, $value->date_of_birth);
+            // $sheet->setCellValue('H' . $row, $value->address);
+            $row++;
+        }
+        $writer = new Xlsx($spreadsheet);
+        // file inside public folder
+        $writer->save($fileName);
+        header('Content-Type: application/vnd.ms-excel');
+        header('Content-Disposition: attachment;filename="' . basename($fileName) . '"');
+        header('Expires: 0');
+        header('Cache-Control: must-revalidate');
+        header('Pragma: public');
+        header('Content-Length: ' . filesize($fileName));
+        flush();
+        readfile($fileName);
+        exit;
+    }
+
 
 
     // Read and Write Files
@@ -543,9 +589,9 @@ class Employee extends BaseController
         $file_contents = "This is a wirte test file";
         write_file('test1.txt', $file_contents);
         // Type #2 - This file will be created inside /writable folder
-        write_file(WRITEPATH.'test2.txt', $file_contents);
+        write_file(WRITEPATH . 'test2.txt', $file_contents);
         // Type #3 - This file will be created inside /public folder and return value
-        if(!write_file('test3.txt', $file_contents)) {
+        if (!write_file('test3.txt', $file_contents)) {
             echo "Failed to write file";
         } else {
             echo "File written Successfully.";
@@ -559,7 +605,7 @@ class Employee extends BaseController
         print_r($data1);
         echo "<br>";
         // Type #2 - Read file from witeable folder
-        $data2 = readFile(WRITEPATH. 'test2.txt');
+        $data2 = readFile(WRITEPATH . 'test2.txt');
         print_r($data2);
     }
 
@@ -576,7 +622,7 @@ class Employee extends BaseController
         // line chart
         $year_wise = $this->db->query("SELECT COUNT(id) as total, YEAR(created_at) as year FROM datatables GROUP BY YEAR(created_at)")->getResult();
         $data['year_wise_line'] = $year_wise;
-        
+
         // Bar chart
         $year_wise = $this->db->query("SELECT COUNT(id) as total, YEAR(created_at) as year FROM datatables GROUP BY YEAR(created_at)")->getResult();
         $data['year_wise_bar'] = $year_wise;
@@ -585,25 +631,66 @@ class Employee extends BaseController
         $year_wise = $this->db->query("SELECT COUNT(id) as total, YEAR(created_at) as year FROM datatables GROUP BY YEAR(created_at)")->getResult();
         $data['year_wise_pie'] = $year_wise;
 
-        
+
         return view('clientside/charts-integration', $data);
     }
+
+    // Multi Image & File
+    public function multiImage()
+    {
+        if ($this->request->getMethod() == "post") {
+            $builder = $this->db->table('multipleimages');
+            $session = session();
+            $allowed_ext = ["image/jpg", "image/png", "image/jpeg"];
+            $image_count = 0;
+            if ($this->request->getFileMultiple('image')) {
+                foreach ($this->request->getFileMultiple('image') as $image) {
+                    $mime = $image->getClientMimeType();
+                    if (in_array($mime, $allowed_ext)) {
+                        $image->move(WRITEPATH . 'multiple_image');
+                        $data = [
+                            'name' => $image->getClientName(),
+                            'path' => 'multiple_image/' . $image->getClientName()
+                        ];
+                        $builder->insert($data);
+                        $image_count++;
+                    }
+                }
+                if ($image_count > 0) {
+
+                    $session->setFlashdata("success", "Files uploaded Successfully");
+                } else {
+                    $session->setFlashdata("error", "Please select only image file");
+                }
+            } else {
+                $session->setFlashdata("error", "Please choose image file");
+            }
+        }
+        return view('clientside/multi-image-file');
+    }
+
+    public function multiFile()
+    {
+        if ($this->request->getMethod() == "post") {
+            $builder = $this->db->table('multiplefiles');
+            $session = session();
+            if ($this->request->getFileMultiple('file')) {
+                foreach ($this->request->getFileMultiple('file') as $file) {
+                    $file->move(WRITEPATH . 'multiple_file');
+                    $data = [
+                        'name' =>  $file->getClientName(),
+                        'type'  => $file->getClientMimeType(),
+                        'path' => 'multiple_file/' . $file->getClientName()
+                    ];
+
+                    $builder->insert($data);
+                }
+                $session->setFlashdata("success", "Files uploaded Successfully");
+            } else {
+                $session->setFlashdata("error", "Please choose file");
+            }
+        }
+
+        return view('clientside/multi-image-file');
+    }
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

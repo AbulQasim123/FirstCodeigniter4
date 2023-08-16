@@ -57,3 +57,10 @@ input[type=search]:not(.browser-default) {
 #Load_table_length select{
     width: 200%;
 }
+
+
+@media screen and (max-width: 600px) {
+    .upload_doc{
+        margin-top: -140px;   
+    }
+}

@@ -5,6 +5,9 @@ namespace Config;
 use App\Controllers\AuthController;
 use App\Controllers\Employee as EmployeeController;
 use App\Controllers\CrudApiController;
+use App\Controllers\Auth\UserController;
+use App\Controllers\Auth\AdminController;
+use App\Controllers\Auth\EditorController;
 // Create a new instance of our RouteCollection class.
 $routes = Services::routes();
 
@@ -17,7 +20,7 @@ $routes->setDefaultNamespace('App\Controllers');
 $routes->setDefaultController('Home');
 $routes->setDefaultMethod('index');
 $routes->setTranslateURIDashes(false);
-$routes->set404Override(function(){
+$routes->set404Override(function () {
     return view("404");
 });
 // The Auto Routing (Legacy) is very dangerous. It is easy to create vulnerable apps
@@ -68,34 +71,53 @@ $routes->group('serverside', ['filter' => 'auth'], function ($routes) {
 
 
     // Here are About Images Uploading routes
-    $routes->match(['get','post'],'img-uploads', [EmployeeController::class, 'uploadImage'], ['as' => 'img.uploads']);
+    $routes->match(['get', 'post'], 'img-uploads', [EmployeeController::class, 'uploadImage'], ['as' => 'img.uploads']);
     //  Server Side DataTable 
-    $routes->post("ajax-loadData", [EmployeeController::class,'ajaxLoadData']);
+    $routes->post("ajax-loadData", [EmployeeController::class, 'ajaxLoadData']);
     // Generate PDF
-    $routes->get("generate-pdf", [EmployeeController::class,'generatePDF'], ['as' => 'generate.pdf']);
+    $routes->get("generate-pdf", [EmployeeController::class, 'generatePDF'], ['as' => 'generate.pdf']);
     // Read and Write Files
-    $routes->get("write-file", [EmployeeController::class,'readFile']);
-    $routes->get("read-file", [EmployeeController::class,'writeFile']);
+    $routes->get("write-file", [EmployeeController::class, 'readFile']);
+    $routes->get("read-file", [EmployeeController::class, 'writeFile']);
 
     // How to get Local IP Address of System
-    $routes->get("get-ip-add", [EmployeeController::class,'getIpAddress']);
+    $routes->get("get-ip-add", [EmployeeController::class, 'getIpAddress']);
 
     // Google Line Chart Integration
-    $routes->get("charts-integration", [EmployeeController::class,'chartsIntegration'],['as' => 'charts.integration']);
+    $routes->get("charts-integration", [EmployeeController::class, 'chartsIntegration'], ['as' => 'charts.integration']);
 
+    // Download Excel
+    $routes->get("download-excel", [EmployeeController::class, 'downloadExcel'], ['as' => 'download.excel']);
     
-
-
+    // Multi Image & File
+    $routes->match(['get','post'],"multi-image", [EmployeeController::class, 'multiImage'], ['as' => 'multi.image']);
+    $routes->match(['get','post'],"multi-file", [EmployeeController::class, 'multiFile'], ['as' => 'multi.file']);
 });
-
- // Crud Rest API Development
- $routes->group('api',function($routes){
+// Crud Rest API Development
+$routes->group('api', function ($routes) {
     $routes->get('fetch', [CrudApiController::class, 'fetch']);
     $routes->post('create', [CrudApiController::class, 'create']);
     $routes->get('show/(:num)', [CrudApiController::class, 'show']);
     $routes->post('update/(:num)', [CrudApiController::class, 'update']);
     $routes->get('delete/(:num)', [CrudApiController::class, 'delete']);
- });
+});
+
+//  Multi Auth user Role wise login
+$routes->match(['get', 'post'], 'mutli-auth-login', [UserController::class, 'multiAuthLogin'],['as' => 'multi.auth.login'], ['filter' => 'multi-noauth']);
+// Admin routes
+$routes->group("admin", ["filter" => "multi-auth"], function ($routes) {
+    $routes->get("/", [AdminController::class, 'index']);
+});
+// Editor routes
+$routes->group("editor", ["filter" => "multi-auth"], function ($routes) {
+    $routes->get("/", [EditorController::class,'index']);
+});
+$routes->get('auth-logout', [UserController::class, 'authLogout'], ['as' => 'auth.logout']);
+
+
+
+
+
 
 /*
  * --------------------------------------------------------------------
