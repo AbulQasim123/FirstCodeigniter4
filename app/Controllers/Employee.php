@@ -8,7 +8,8 @@ use App\Models\PostModel;
 use App\Models\ImgUploadModel;
 use App\Models\DatatableModel;
 use Dompdf\Dompdf;
-
+use App\Models\DropzoneModel;
+use App\Models\LoadMoreModel;
 // import Excel package
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
@@ -21,6 +22,7 @@ class Employee extends BaseController
     protected $imgUpload;
     protected $datatable;
     protected $db;
+    private $perPage = 10;
     public function __construct()
     {
         $this->employee = new EmployeeModel();
@@ -630,8 +632,6 @@ class Employee extends BaseController
         // Pie chart
         $year_wise = $this->db->query("SELECT COUNT(id) as total, YEAR(created_at) as year FROM datatables GROUP BY YEAR(created_at)")->getResult();
         $data['year_wise_pie'] = $year_wise;
-
-
         return view('clientside/charts-integration', $data);
     }
 
@@ -692,5 +692,24 @@ class Employee extends BaseController
         }
 
         return view('clientside/multi-image-file');
+    }
+
+    //  Dropzone Document Upload
+    public function dropzoneUpload()
+    {
+        $image = $this->request->getFile('file');
+        $imageName = $image->getName();
+        $image->move(WRITEPATH . 'dropzone-upload', $imageName);
+
+        $dropzone = new DropzoneModel();
+        $data = [
+            'filename' => $imageName,
+        ];
+
+        $dropzone->insert($data);
+        return json_encode(array(
+            'status' => 1,
+            'filename' => $imageName
+        ));
     }
 }

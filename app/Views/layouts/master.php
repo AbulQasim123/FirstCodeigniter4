@@ -18,8 +18,9 @@
     <!-- Sweetalert library file -->
     <link href="https://cdn.jsdelivr.net/npm/sweetalert2@9.17.2/dist/sweetalert2.min.css" rel="stylesheet" />
     <!-- DataTable Button Style -->
-    <link rel="stylesheet" href="https://cdn.datatables.net/buttons/1.6.5/css/buttons.dataTables.min.css"/>
-   
+    <link rel="stylesheet" href="https://cdn.datatables.net/buttons/1.6.5/css/buttons.dataTables.min.css" />
+    <!-- Dropzone Library CSS -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/dropzone/4.0.1/min/dropzone.min.css" rel="stylesheet">
 </head>
 
 <body>
@@ -59,6 +60,8 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.53/pdfmake.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.53/vfs_fonts.js"></script>
     <script src="https://cdn.datatables.net/buttons/1.6.5/js/buttons.html5.min.js"></script>
+    <!-- Dropzone Library JS -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/dropzone/4.2.0/min/dropzone.min.js"></script>
     <script>
         $(document).ready(function() {
             $("#data_table_excel").DataTable({
@@ -74,6 +77,15 @@
         });
     </script>
 
+    <!-- Dropzone Document Upload -->
+    <script>
+        Dropzone.options.imageUpload = {
+            maxFilesize: 1,
+            acceptedFiles: '.jpeg,.jpg,.png,.gif',
+            addRemoveLinks: true,
+            dictRemoveFile: 'Remove',
+        };
+    </script>
 </body>
 
 </html>

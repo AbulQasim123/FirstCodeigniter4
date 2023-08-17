@@ -36,6 +36,7 @@
                     <ul class="tabs">
                         <li class="tab col s3"><a class="blue-text" href="#image">Image</a></li>
                         <li class="tab col s3"><a class="blue-text" href="#file">File </a></li>
+                        <li class="tab col s3"><a class="blue-text" href="#dropzone">Dropzone </a></li>
                     </ul>
                 </div>
                 <div id="image" class="col s12">
@@ -46,7 +47,7 @@
                                 <div class="file-field input-field">
                                     <div class="btn">
                                         <span>Images</span>
-                                        <input type="file" name="image[]" id="image" multiple >
+                                        <input type="file" name="image[]" id="image" multiple>
                                     </div>
                                     <div class="file-path-wrapper">
                                         <input class="file-path validate" type="text" placeholder="Upload Images">
@@ -81,6 +82,17 @@
                             </div>
                         </div>
                     </form>
+                </div>
+                <!-- Dropzone Document Upload -->
+                <div id="dropzone" class="col s12">
+                    <div class="row">
+                        <h5>Upload Files</h5>
+                        <form action="<?= route_to('dropzone.upload') ?>" method="post" enctype="multipart/form-data" class="dropzone" id="dropzone-upload">
+                            <div>
+                                <h3 class="text-center">Upload Multiple Image By Click On Box</h3>
+                            </div>
+                        </form>
+                    </div>
                 </div>
             </div>
         </div>

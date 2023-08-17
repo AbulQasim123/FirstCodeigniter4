@@ -92,6 +92,10 @@ $routes->group('serverside', ['filter' => 'auth'], function ($routes) {
     // Multi Image & File
     $routes->match(['get','post'],"multi-image", [EmployeeController::class, 'multiImage'], ['as' => 'multi.image']);
     $routes->match(['get','post'],"multi-file", [EmployeeController::class, 'multiFile'], ['as' => 'multi.file']);
+    // Dropzone Document Upload
+    $routes->post("dropzone-upload", [EmployeeController::class, 'dropzoneUpload'], ['as' => 'dropzone.upload']);
+    // Load More Data using window Scroll
+    $routes->get("load-more-data", [EmployeeController::class, 'loadMoreData'], ['as' => 'loadMore.data']);
 });
 // Crud Rest API Development
 $routes->group('api', function ($routes) {
